@@ -1,0 +1,42 @@
+import torch
+import torch.optim as optim
+import torch.nn as nn
+from torch.utils.data import TensorDataset, DataLoader
+
+# Define a simple feed-forward neural network model
+model = nn.Sequential(
+    nn.Linear(784, 128),
+    nn.ReLU(),
+    nn.Linear(128, 10)
+)
+
+# Set a fixed learning rate
+learning_rate = 0.01
+optimizer = optim.SGD(model.parameters(), lr=learning_rate)
+
+# Define a learning rate scheduler
+scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.1)
+
+# Example data
+inputs = torch.randn(64, 784)  # Batch of 64 images of size 28x28 (flattened)
+targets = torch.randint(0, 10, (64,))  # Batch of 64 labels (integer values between 0 and 9)
+
+# Wrap in a DataLoader
+dataset = TensorDataset(inputs, targets)
+data_loader = DataLoader(dataset, batch_size=64)
+
+# Define loss function
+criterion = nn.CrossEntropyLoss()
+
+# Training loop
+for epoch in range(50):
+    for inputs, targets in data_loader:
+        optimizer.zero_grad()
+        outputs = model(inputs)
+        loss = criterion(outputs, targets)
+        loss.backward()
+        optimizer.step()
+
+    scheduler.step()  # Update the learning rate
+
+    print(f"Epoch {epoch+1}, Learning Rate: {scheduler.get_last_lr()[0]}")

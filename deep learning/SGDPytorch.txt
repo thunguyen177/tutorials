@@ -1,0 +1,34 @@
+import torch
+import torch.optim as optim
+
+# Toy data
+x = torch.tensor([1.0, 2.0, 3.0, 4.0, 5.0])
+y = torch.tensor([2.0, 4.0, 6.0, 8.0, 10.0])  # y = 2x
+
+# Randomly initialize weights
+w = torch.tensor([1.0], requires_grad=True)
+
+# Define model
+def model(x):
+    return x * w
+
+# Define loss function
+def loss_fn(y_hat, y):
+    return ((y_hat - y)**2).mean()
+
+# Define optimizer
+optimizer = optim.SGD([w], lr=0.01)
+
+# Training loop
+for epoch in range(100):
+    y_hat = model(x)
+    loss = loss_fn(y_hat, y)
+
+    loss.backward()  # Compute gradients
+    optimizer.step()  # Update weights
+    optimizer.zero_grad()  # Clear gradients
+
+    if epoch % 10 == 0:
+        print(f'Epoch {epoch+1}: w = {w.item():.3f}, loss = {loss.item():.3f}')
+
+print(f'Prediction after training: f(5) = {model(5).item():.3f}')

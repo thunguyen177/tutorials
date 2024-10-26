@@ -1,0 +1,35 @@
+import torch
+import torch.nn as nn
+import torch.optim as optim
+from torch.utils.data import TensorDataset, DataLoader
+
+# Toy data
+x = torch.randn(100, 10)  # 100 samples, 10 features each
+y = torch.randn(100, 1)  # 100 targets
+
+# Wrap in a Dataset and DataLoader for minibatch training
+dataset = TensorDataset(x, y)
+data_loader = DataLoader(dataset, batch_size=20)  # Minibatch size of 20
+
+# Define a simple model with batch normalization
+model = nn.Sequential(
+    nn.Linear(10, 5),
+    nn.BatchNorm1d(5),  # Batch normalization
+    nn.ReLU(),
+    nn.Linear(5, 1)
+)
+
+# Define loss function and optimizer
+criterion = nn.MSELoss()
+optimizer = optim.SGD(model.parameters(), lr=0.01)
+
+# Training loop
+for epoch in range(50):
+    for batch_x, batch_y in data_loader:
+        optimizer.zero_grad()
+        outputs = model(batch_x)
+        loss = criterion(outputs, batch_y)
+        loss.backward()
+        optimizer.step()
+
+    print(f'Epoch {epoch+1}, Loss: {loss.item()}')
