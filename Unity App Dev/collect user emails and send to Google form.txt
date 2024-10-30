@@ -1,0 +1,46 @@
+using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.Networking;
+using System.Collections;
+
+public class GoogleFormSubmitter : MonoBehaviour
+{
+    // Attach this to an InputField in the Inspector
+    public InputField emailInputField;
+
+    // Replace with your Google Form's POST URL
+    private string googleFormUrl = "https://docs.google.com/forms/d/e/your-form-id/formResponse";
+
+    // Replace with your Google Form's entry ID for the email field
+    private string emailFieldEntryID = "entry.1234567890";
+
+    public void SubmitEmail()
+    {
+        if (string.IsNullOrEmpty(emailInputField.text))
+        {
+            Debug.LogError("Email field is empty.");
+            return;
+        }
+
+        StartCoroutine(PostEmailToGoogleForm(emailInputField.text));
+    }
+
+    private IEnumerator PostEmailToGoogleForm(string email)
+    {
+        WWWForm form = new WWWForm();
+        form.AddField(emailFieldEntryID, email);
+
+        UnityWebRequest request = UnityWebRequest.Post(googleFormUrl, form);
+
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            Debug.Log("Email submitted successfully.");
+        }
+        else
+        {
+            Debug.LogError("Error submitting email: " + request.error);
+        }
+    }
+}
