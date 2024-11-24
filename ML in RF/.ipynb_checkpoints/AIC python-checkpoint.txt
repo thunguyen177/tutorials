@@ -1,0 +1,41 @@
+import statsmodels.api as sm
+import itertools
+import pandas as pd
+from sklearn.datasets import fetch_california_housing
+
+# Load the California Housing dataset
+california = fetch_california_housing()
+X = pd.DataFrame(california.data, columns=california.feature_names)
+y = pd.Series(california.target, name='MedHouseVal')
+
+# Add a constant to the model (intercept)
+X = sm.add_constant(X)
+
+# Function to fit model and get AIC
+def fit_model(features):
+    model = sm.OLS(y, X[list(features)]).fit()  # Use list(features) to handle tuples
+    return model.aic
+
+# Generate all possible combinations of features
+features = X.columns.tolist()
+features.remove('const')  # Remove the constant term from the list of features
+results = []
+
+for k in range(1, len(features) + 1):
+    for combo in itertools.combinations(features, k):
+        combo = ('const',) + combo  # Add constant term to the feature set
+        aic = fit_model(combo)
+        results.append((combo, aic))
+
+# Convert results to DataFrame
+results_df = pd.DataFrame(results, columns=['Features', 'AIC'])
+
+# Sort the DataFrame by AIC and get the best features
+sorted_df = results_df.sort_values(by='AIC')
+best_features = sorted_df.iloc[0, 0]
+
+# Fit the model using the best features
+model = sm.OLS(y, X[list(best_features)]).fit()
+
+# Display the summary of the model
+print(model.summary())

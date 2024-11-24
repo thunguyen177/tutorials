@@ -1,0 +1,19 @@
+# Load necessary package
+if (!require("MASS")) install.packages("MASS", dependencies = TRUE)
+library(MASS)
+
+# Load the mtcars dataset
+data(mtcars)
+
+# Automated stepwise model selection based on BIC
+full_model <- lm(mpg ~ ., data = mtcars)   # Full model with all predictors
+null_model <- lm(mpg ~ 1, data = mtcars)  # Null model with intercept only
+
+selected_model <- step(null_model, 
+                       scope = list(lower = null_model, upper = full_model), 
+                       direction = "both", 
+                       k = log(nrow(mtcars)))  # k = log(n) for BIC
+
+# Summary of the selected model
+print("Summary of the Selected Model:")
+summary(selected_model)
