@@ -1,0 +1,20 @@
+# Sample data creation
+set.seed(0)
+data <- matrix(runif(300), nrow=100, ncol=3)  # 100 samples with 3 features
+# Standardize the data
+data_scaled <- scale(data)
+# Perform PCA
+pca <- prcomp(data_scaled, center = TRUE, scale. = TRUE)
+# Create a data frame with the principal components
+principal_components <- data.frame(pca$x[,1:2])
+colnames(principal_components) <- c("PC1", "PC2")
+# Plot the principal components
+library(ggplot2)
+ggplot(principal_components, aes(x = PC1, y = PC2)) +
+  geom_point() +
+  ggtitle("2 component PCA") +
+  xlab("Principal Component 1") +
+  ylab("Principal Component 2")
+# Explained variance
+explained_variance <- pca$sdev^2 / sum(pca$sdev^2)
+print(explained_variance)

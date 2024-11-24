@@ -1,0 +1,54 @@
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import numpy as np
+
+# Define the model with Dropout layers
+class MC_Dropout_Model(nn.Module):
+    def __init__(self, input_size, hidden_size, output_size, dropout_rate=0.5):
+        super(MC_Dropout_Model, self).__init__()
+        self.fc1 = nn.Linear(input_size, hidden_size)
+        self.dropout = nn.Dropout(dropout_rate)
+        self.fc2 = nn.Linear(hidden_size, output_size)
+
+    def forward(self, x):
+        x = F.relu(self.fc1(x))
+        x = self.dropout(x)  # Apply dropout during inference
+        x = self.fc2(x)
+        return x
+
+# Function to perform MC Dropout inference
+def mc_dropout_predict(model, x, n_samples=100):
+    model.train()  # Keep dropout layers active during inference
+    predictions = []
+
+    with torch.no_grad():
+        for _ in range(n_samples):
+            predictions.append(model(x))
+
+    # Stack predictions for each pass along a new dimension and calculate mean and variance
+    predictions = torch.stack(predictions)
+    mean_prediction = predictions.mean(dim=0)
+    uncertainty = predictions.var(dim=0)
+
+    return mean_prediction, uncertainty
+
+# Example Usage
+if __name__ == "__main__":
+    # Initialize model, dummy data, and parameters
+    input_size = 10
+    hidden_size = 20
+    output_size = 1
+    dropout_rate = 0.5
+    n_samples = 100
+
+    model = MC_Dropout_Model(input_size, hidden_size, output_size, dropout_rate)
+
+    # Dummy input tensor
+    x = torch.randn((1, input_size))
+
+    # Get predictions and uncertainty
+    mean_prediction, uncertainty = mc_dropout_predict(model, x, n_samples=n_samples)
+
+    print("Mean Prediction:", mean_prediction)
+    print("Uncertainty (Variance):", uncertainty)

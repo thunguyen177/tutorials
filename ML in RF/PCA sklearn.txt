@@ -1,0 +1,25 @@
+import numpy as np
+import pandas as pd
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+import matplotlib.pyplot as plt
+# Sample data creation
+np.random.seed(0)
+data = np.random.rand(100, 3)  # 100 samples with 3 features
+# Standardize the data
+scaler = StandardScaler()
+scaled_data = scaler.fit_transform(data)
+# Perform PCA
+pca = PCA(n_components=2)
+principal_components = pca.fit_transform(scaled_data)
+# Create a DataFrame with the principal components
+principal_df = pd.DataFrame(data=principal_components, columns=['PC1', 'PC2'])
+# Plot the principal components
+plt.figure(figsize=(8, 6))
+plt.scatter(principal_df['PC1'], principal_df['PC2'])
+plt.xlabel('Principal Component 1')
+plt.ylabel('Principal Component 2')
+plt.title('2 component PCA')
+plt.show()
+# Explained variance
+print(f"Explained variance ratio: {pca.explained_variance_ratio_}")
