@@ -1,0 +1,9 @@
+am_data <- as.data.frame(table(mtcars$am))
+colnames(am_data) <- c("Transmission", "Count")
+am_data$Transmission <- factor(am_data$Transmission, labels = c("Tự động", "Số tay"))
+
+ggplot(am_data, aes(x = Transmission, y = Count, fill = Transmission)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Số lượng xe theo hộp số", x = "Loại hộp số", y = "Số lượng xe") +
+  theme_minimal() +
+  scale_fill_manual(values = c("skyblue", "orange"))
