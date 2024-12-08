@@ -1,3 +1,19 @@
+# biểu đồ tròn
+install.packages("ggplot2")
+library(ggplot2)
+
+cyl_data <- as.data.frame(table(mtcars$cyl))
+colnames(cyl_data) <- c("Cylinders", "Count")
+
+ggplot(cyl_data, aes(x = "", y = Count, fill = as.factor(Cylinders))) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar("y", start = 0) +
+  labs(title = "Tỷ lệ xe theo số xi-lanh", fill = "Xi-lanh") +
+  theme_void() +
+  scale_fill_brewer(palette = "Set3")
+
+
+# biểu đồ cột
 am_data <- as.data.frame(table(mtcars$am))
 colnames(am_data) <- c("Transmission", "Count")
 am_data$Transmission <- factor(am_data$Transmission, labels = c("Tự động", "Số tay"))
