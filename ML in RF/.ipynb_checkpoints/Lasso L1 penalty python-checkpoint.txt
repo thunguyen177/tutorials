@@ -1,0 +1,44 @@
+# Step 1: Import necessary libraries
+import numpy as np
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, classification_report
+
+# Step 2: Load the Iris dataset
+data = load_iris()
+X, y = data.data, data.target
+
+# Use only two classes for binary classification
+# Selecting only two classes (0 and 1) for demonstration purposes
+X = X[y != 2]
+y = y[y != 2]
+
+# Step 3: Split the dataset into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+# Step 4: Scale the features (important for logistic regression)
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# Step 5: Perform Logistic Regression with L1 penalty
+# Set solver to 'liblinear' since it's compatible with L1 penalty
+logreg_l1 = LogisticRegression(penalty='l1', solver='liblinear', C=1.0)
+logreg_l1.fit(X_train_scaled, y_train)
+
+# Step 6: Make predictions and evaluate the model
+y_pred = logreg_l1.predict(X_test_scaled)
+
+# Evaluate performance
+accuracy = accuracy_score(y_test, y_pred)
+report = classification_report(y_test, y_pred)
+
+print(f"Accuracy: {accuracy * 100:.2f}%")
+print("Classification Report:")
+print(report)
+
+# Step 7: Check the model coefficients
+print("Model Coefficients (L1 Penalty):")
+print(logreg_l1.coef_)

@@ -1,0 +1,16 @@
+# pip install yfinance #if you haven't install yahoo finance yet
+import yfinance as yf
+import matplotlib.pyplot as plt
+
+# Fetch the stock data
+stock_data = yf.download('AAPL', start='2010-01-01', end='2023-12-01')
+
+# Plot the stock data
+plt.figure(figsize=(10, 5))
+plt.plot(stock_data.index, stock_data['Close'], label='Close Price')
+plt.title('Apple Inc. (AAPL) Stock Price')
+plt.xlabel('Date')
+plt.ylabel('Close Price (USD)')
+plt.legend()
+plt.grid(True)
+plt.show()
