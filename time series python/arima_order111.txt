@@ -1,0 +1,24 @@
+from sktime.pipeline import make_pipeline
+from sktime.transformations.series.adapt import TabularToSeriesAdaptor
+from sktime.forecasting.arima import ARIMA
+from sktime.datasets import load_airline
+from sklearn.preprocessing import StandardScaler
+
+# Load sample dataset
+y = load_airline()
+
+# Define the scaler (wrapped to adapt to time series)
+scaler = TabularToSeriesAdaptor(StandardScaler())
+
+# Define the forecaster
+forecaster = ARIMA(order=(1, 1, 1))
+
+# Create the pipeline using make_pipeline
+pipeline = make_pipeline(scaler, forecaster)
+
+# Fit the pipeline
+pipeline.fit(y)
+
+# Forecast for 12 steps ahead
+y_pred = pipeline.predict(fh=12)
+print(y_pred)

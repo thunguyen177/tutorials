@@ -1,0 +1,29 @@
+import matplotlib.pyplot as plt
+from sktime.datasets import load_airline
+from sktime.forecasting.arima import ARIMA
+import numpy as np
+
+# Load data
+y = load_airline()
+
+# Initialize ARIMA forecaster
+forecaster = ARIMA(
+    order=(1, 1, 0),
+    seasonal_order=(0, 1, 0, 12),
+    suppress_warnings=True
+)
+
+# Fit the model
+forecaster.fit(y)
+
+# Generate predictions
+y_pred = forecaster.predict(fh=np.arange(20))
+
+# Plot the predictions
+plt.figure(figsize=(10, 5))
+plt.plot(y.to_timestamp(), label='Actual')
+plt.plot(y_pred, label='Forecast', color='red')
+plt.title('ARIMA Model Forecast - airline dataset')
+plt.legend()
+plt.savefig('airline.jpg')
+plt.show()
