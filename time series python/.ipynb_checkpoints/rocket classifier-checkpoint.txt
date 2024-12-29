@@ -1,0 +1,23 @@
+# Import the RocketClassifier from sktime
+from sktime.classification.kernel_based import RocketClassifier
+
+# Import the unit test dataset from sktime
+from sktime.datasets import load_unit_test
+
+# Load the training data (features and target)
+X_train, y_train = load_unit_test(split="train", return_X_y=True)
+
+# Load the testing data (features and target)
+X_test, y_test = load_unit_test(split="test", return_X_y=True) 
+
+# Initialize the RocketClassifier with 500 kernels
+reg = RocketClassifier(num_kernels=500) 
+
+# Fit the RocketClassifier model on the training data
+reg.fit(X_train, y_train) 
+
+# Predict the target values for the test data
+y_pred = reg.predict(X_test) 
+
+# Calculate the accuracy of the predictions
+accuracy = np.mean(y_pred == y_test)

@@ -1,0 +1,42 @@
+# Import necessary libraries
+import numpy as np
+from sktime.classification.distance_based import KNeighborsTimeSeriesClassifier
+from sktime.datasets import load_italy_power_demand
+from sktime.dists_kernels import FlatDist, ScipyDist
+from sklearn.preprocessing import StandardScaler
+
+# Load the Italy Power Demand dataset
+X_train, y_train = load_italy_power_demand(split="train", return_type="numpy3D")
+X_test, y_test = load_italy_power_demand(split="test", return_type="numpy3D")
+print(X_train[:2])
+
+# Flatten the 3D array to 2D for normalization
+X_train_flat = X_train.reshape(X_train.shape[0], -1)
+X_test_flat = X_test.reshape(X_test.shape[0], -1)
+
+# Initialize the StandardScaler and fit it to the training data
+scaler = StandardScaler()
+X_train_flat = scaler.fit_transform(X_train_flat)
+X_test_flat = scaler.transform(X_test_flat)
+
+# Reshape the data back to 3D after normalization
+X_train = X_train_flat.reshape(X_train.shape)
+X_test = X_test_flat.reshape(X_test.shape)
+
+# Create an instance of the Euclidean distance function
+eucl_dist = FlatDist(ScipyDist())
+
+# Initialize the KNeighborsTimeSeriesClassifier with 3 neighbors and the Euclidean distance
+clf = KNeighborsTimeSeriesClassifier(n_neighbors=3, distance=eucl_dist)
+
+# Fit the KNeighborsTimeSeriesClassifier model on the training data
+clf.fit(X_train, y_train)
+
+# Predict the target values for the test data
+y_pred = clf.predict(X_test)
+
+# Calculate the accuracy of the predictions
+accuracy = np.mean(y_test == y_pred)
+
+# Print the accuracy
+print(f"Accuracy: {accuracy}")
