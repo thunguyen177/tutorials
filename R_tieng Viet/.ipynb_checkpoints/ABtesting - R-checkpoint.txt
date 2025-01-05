@@ -1,0 +1,19 @@
+# Dữ liệu
+n1 <- 1000
+x1 <- 120
+n2 <- 1000
+x2 <- 150
+
+# Thực hiện kiểm định z
+test_result <- prop.test(c(x1, x2), c(n1, n2), alternative = "two.sided", correct = FALSE)
+
+# Kết quả
+print(test_result)
+
+# Kết luận
+alpha <- 0.05
+if (test_result$p.value < alpha) {
+  print("Bác bỏ giả thuyết không (H0): Có sự khác biệt có ý nghĩa thống kê.")
+} else {
+  print("Không đủ bằng chứng để bác bỏ giả thuyết không (H0).")
+}

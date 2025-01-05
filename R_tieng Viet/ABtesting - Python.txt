@@ -1,0 +1,30 @@
+import numpy as np
+import scipy.stats as stats
+
+# Dữ liệu
+n1, x1 = 1000, 120  # Nhóm A: số mẫu, số chuyển đổi
+n2, x2 = 1000, 150  # Nhóm B: số mẫu, số chuyển đổi
+
+# Tính tỷ lệ chuyển đổi
+p1 = x1 / n1
+p2 = x2 / n2
+
+# Tỷ lệ tổng hợp
+p_pool = (x1 + x2) / (n1 + n2)
+
+# Tính thống kê z
+z_score = (p1 - p2) / np.sqrt(p_pool * (1 - p_pool) * (1/n1 + 1/n2))
+
+# Tính p-value (test hai phía)
+p_value = 2 * (1 - stats.norm.cdf(abs(z_score)))
+
+# Kết quả
+print(f"Z-score: {z_score:.4f}")
+print(f"P-value: {p_value:.4f}")
+
+# Kết luận
+alpha = 0.05
+if p_value < alpha:
+    print("Bác bỏ giả thuyết không (H0): Có sự khác biệt có ý nghĩa thống kê.")
+else:
+    print("Không đủ bằng chứng để bác bỏ giả thuyết không (H0).")
