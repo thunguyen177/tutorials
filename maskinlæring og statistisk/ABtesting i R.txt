@@ -1,0 +1,28 @@
+# A/B-test i R ved hjelp av en Z-test for proporsjoner med 'prop.test' fra base R
+library(stats)
+
+ab_test <- function(n_A, conv_A, n_B, conv_B, alpha=0.05) {
+  # Data
+  successes <- c(conv_A, conv_B)
+  trials <- c(n_A, n_B)
+  
+  # Utfør proporsjonstest
+  test_result <- prop.test(successes, trials, alternative = "two.sided", conf.level = 1 - alpha)
+  
+  # Resultater
+  cat(sprintf("Konverteringsrate A: %.4f\n", successes[1] / trials[1]))
+  cat(sprintf("Konverteringsrate B: %.4f\n", successes[2] / trials[2]))
+  cat(sprintf("Z-score: %.4f\n", sqrt(test_result$statistic)))
+  cat(sprintf("p-verdi: %.4f\n", test_result$p.value))
+  cat(sprintf("95%% konfidensintervall: (%.4f, %.4f)\n", test_result$conf.int[1], test_result$conf.int[2]))
+  
+  # Konklusjon
+  if (test_result$p.value < alpha) {
+    cat("➡️  Statistisk signifikant forskjell! Implementer versjon B.\n")
+  } else {
+    cat("➡️  Ingen statistisk signifikant forskjell.\n")
+  }
+}
+
+# Eksempeldata: Gruppe A (5000 besøkende, 250 konverteringer) og Gruppe B (5000 besøkende, 300 konverteringer)
+ab_test(n_A=5000, conv_A=250, n_B=5000, conv_B=300)

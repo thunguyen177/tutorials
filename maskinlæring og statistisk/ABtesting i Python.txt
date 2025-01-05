@@ -1,0 +1,50 @@
+import numpy as np
+import scipy.stats as stats
+
+def ab_test(n_A, conv_A, n_B, conv_B, alpha=0.05):
+    """
+    Gjennomfører en A/B-test ved hjelp av en Z-test for proporsjoner.
+    
+    Parametere:
+    n_A: Antall besøkende i gruppe A
+    conv_A: Antall konverteringer i gruppe A
+    n_B: Antall besøkende i gruppe B
+    conv_B: Antall konverteringer i gruppe B
+    alpha: Signifikansnivå (standard 0.05)
+    """
+    # Beregn konverteringsrater
+    p_A = conv_A / n_A
+    p_B = conv_B / n_B
+    
+    # Kombinert konverteringsrate
+    p_combined = (conv_A + conv_B) / (n_A + n_B)
+    
+    # Standardfeil
+    SE = np.sqrt(p_combined * (1 - p_combined) * (1/n_A + 1/n_B))
+    
+    # Z-score
+    Z = (p_B - p_A) / SE
+    
+    # p-verdi (ensidig test, hvis vi sjekker om B > A)
+    p_value = 1 - stats.norm.cdf(Z)
+    
+    # Konfidensintervall (95%)
+    Z_alpha = stats.norm.ppf(1 - alpha/2)
+    CI_lower = (p_B - p_A) - Z_alpha * SE
+    CI_upper = (p_B - p_A) + Z_alpha * SE
+    
+    # Resultater
+    print(f"Konverteringsrate A: {p_A:.4f}")
+    print(f"Konverteringsrate B: {p_B:.4f}")
+    print(f"Z-score: {Z:.4f}")
+    print(f"p-verdi: {p_value:.4f}")
+    print(f"95% konfidensintervall: ({CI_lower:.4f}, {CI_upper:.4f})")
+    
+    # Konklusjon
+    if p_value < alpha:
+        print("Statistisk signifikant forskjell! Implementer versjon B.")
+    else:
+        print("Ingen statistisk signifikant forskjell.")
+
+# Eksempeldata: Gruppe A (5000 besøkende, 250 konverteringer) og Gruppe B (5000 besøkende, 300 konverteringer)
+ab_test(n_A=5000, conv_A=250, n_B=5000, conv_B=300)
