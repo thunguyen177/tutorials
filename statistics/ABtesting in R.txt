@@ -1,0 +1,28 @@
+# A/B test in R using a Z-test for proportions with 'prop.test' from base R
+library(stats)
+
+ab_test <- function(n_A, conv_A, n_B, conv_B, alpha=0.05) {
+  # Data
+  successes <- c(conv_A, conv_B)
+  trials <- c(n_A, n_B)
+  
+  # Perform proportion test
+  test_result <- prop.test(successes, trials, alternative = "two.sided", conf.level = 1 - alpha)
+  
+  # Results
+  cat(sprintf("Conversion rate A: %.4f\n", successes[1] / trials[1]))
+  cat(sprintf("Conversion rate B: %.4f\n", successes[2] / trials[2]))
+  cat(sprintf("Z-score: %.4f\n", sqrt(test_result$statistic)))
+  cat(sprintf("p-value: %.4f\n", test_result$p.value))
+  cat(sprintf("95%% confidence interval: (%.4f, %.4f)\n", test_result$conf.int[1], test_result$conf.int[2]))
+  
+  # Conclusion
+  if (test_result$p.value < alpha) {
+    cat("Statistically significant difference! Implement version B.\n")
+  } else {
+    cat("No statistically significant difference.\n")
+  }
+}
+
+# Example data: Group A (5000 visitors, 250 conversions) and Group B (5000 visitors, 300 conversions)
+ab_test(n_A=5000, conv_A=250, n_B=5000, conv_B=300)

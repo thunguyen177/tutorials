@@ -1,0 +1,50 @@
+import numpy as np
+import scipy.stats as stats
+
+def ab_test(n_A, conv_A, n_B, conv_B, alpha=0.05):
+    """
+    Conducts an A/B test using a Z-test for proportions.
+    
+    Parameters:
+    n_A: Number of visitors in group A
+    conv_A: Number of conversions in group A
+    n_B: Number of visitors in group B
+    conv_B: Number of conversions in group B
+    alpha: Significance level (default 0.05)
+    """
+    # Calculate conversion rates
+    p_A = conv_A / n_A
+    p_B = conv_B / n_B
+    
+    # Combined conversion rate
+    p_combined = (conv_A + conv_B) / (n_A + n_B)
+    
+    # Standard error
+    SE = np.sqrt(p_combined * (1 - p_combined) * (1/n_A + 1/n_B))
+    
+    # Z-score
+    Z = (p_B - p_A) / SE
+    
+    # p-value (one-sided test, checking if B > A)
+    p_value = 1 - stats.norm.cdf(Z)
+    
+    # Confidence interval (95%)
+    Z_alpha = stats.norm.ppf(1 - alpha/2)
+    CI_lower = (p_B - p_A) - Z_alpha * SE
+    CI_upper = (p_B - p_A) + Z_alpha * SE
+    
+    # Results
+    print(f"Conversion rate A: {p_A:.4f}")
+    print(f"Conversion rate B: {p_B:.4f}")
+    print(f"Z-score: {Z:.4f}")
+    print(f"p-value: {p_value:.4f}")
+    print(f"95% confidence interval: ({CI_lower:.4f}, {CI_upper:.4f})")
+    
+    # Conclusion
+    if p_value < alpha:
+        print("➡️  Statistically significant difference! Implement version B.")
+    else:
+        print("➡️  No statistically significant difference.")
+
+# Example data: Group A (5000 visitors, 250 conversions) and Group B (5000 visitors, 300 conversions)
+ab_test(n_A=5000, conv_A=250, n_B=5000, conv_B=300)
