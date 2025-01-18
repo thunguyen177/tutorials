@@ -1,0 +1,74 @@
+using GoogleMobileAds.Api;
+using UnityEngine;
+using System;
+using Google.Play.AppUpdate;
+using Google.Play.Common;
+
+
+public class OnStartHome : MonoBehaviour
+{
+    public Player player;
+
+    private AppUpdateManager _appUpdateManager;
+
+    void Start()
+    {
+        _appUpdateManager = new AppUpdateManager();
+        CheckForImmediateUpdate();
+
+        // Initialize the Google Mobile Ads SDK.
+        MobileAds.Initialize(initStatus => { });
+    }
+
+ 
+
+    private void CheckForImmediateUpdate()
+    {
+        // Request update information
+        var appUpdateInfoOperation = _appUpdateManager.GetAppUpdateInfo();
+
+        // Attach a callback to handle the result
+        appUpdateInfoOperation.Completed += appUpdateInfo =>
+        {
+            if (appUpdateInfo.Error != AppUpdateErrorCode.NoError)
+            {
+                Debug.LogError("Failed to get update info: " + appUpdateInfo.Error);
+                return;
+            }
+
+            // Check if an update is available and if it can be performed immediately
+            var updateInfo = appUpdateInfo.GetResult();
+            var immediateUpdateOptions = AppUpdateOptions.ImmediateAppUpdateOptions();
+
+            if (updateInfo.UpdateAvailability == UpdateAvailability.UpdateAvailable &&
+                updateInfo.IsUpdateTypeAllowed(immediateUpdateOptions))
+            {
+                StartImmediateUpdate(updateInfo);
+            }
+        };
+    }
+
+    private void StartImmediateUpdate(AppUpdateInfo appUpdateInfo)
+    {
+        Debug.Log("Starting immediate update...");
+
+        // Create AppUpdateOptions for immediate update
+        var appUpdateOptions = AppUpdateOptions.ImmediateAppUpdateOptions();
+
+        var immediateUpdateOperation = _appUpdateManager.StartUpdate(appUpdateInfo, appUpdateOptions);
+
+        // Attach a callback to handle the result of starting the update
+        immediateUpdateOperation.Completed += updateResult =>
+        {
+            if (updateResult.Error != AppUpdateErrorCode.NoError)
+            {
+                Debug.LogError("Immediate update failed: " + updateResult.Error);
+            }
+            else
+            {
+                Debug.Log("Immediate update completed successfully.");
+            }
+        };
+    }
+
+}
